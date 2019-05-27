@@ -1,3 +1,5 @@
+// Consultas https://github.com/Palakis/obs-websocket/blob/4.x-current/docs/generated/protocol.md
+
 const obs = new OBSWebSocket();
 const obs2 = new OBSWebSocket();
 
@@ -51,7 +53,24 @@ async function ActivarOBS() {
   console.log(Volumen);
   let Fuentes = await obs.send('GetSourcesList');
   console.log(Fuentes);
+  console.log("Cantidad Fuentes: " + Fuentes.sources.length);
+  let InfoFuente = await obs.send('GetSourceSettings', {
+    sourceName: 'Camara',
+    sourceType: 'v4l2_input'
 
+  });
+  console.log(InfoFuente);
+  console.log("El puerto Camara " + InfoFuente.sourceSettings.device_id)
+
+  let Configurar = await obs.send('SetSourceSettings', {
+    sourceName: 'Camara',
+    sourceType: 'v4l2_input',
+    sourceSettings: {
+      device_id: "/dev/video0"
+    }
+  });
+  console.log("Condigurar ");
+  console.log(Configurar);
 }
 
 function CambiarEsena() {
@@ -70,4 +89,12 @@ obs.on('SwitchScenes', data => {
 
 obs.on('error', err => {
   console.error('socket error:', err);
+});
+
+obs.on('ConnectionOpened', data => {
+  console.log("Abrieron OBS  " + data)
+});
+
+obs.on('ConnectionClosed', data => {
+  console.log("Cerrado OBS " + data)
 });
